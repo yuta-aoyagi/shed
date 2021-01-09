@@ -1,4 +1,5 @@
 #!/usr/bin/ruby -W
+# frozen_string_literal: true
 
 def stars(num)
   "*" * num
@@ -6,10 +7,12 @@ end
 
 def convert_id_if_possible(line)
   return nil unless (md = /aws_access_key_id\s*=\s*/.match(line))
+
   (md2 = /\A(A3T|A[A-Z]{2}A|A[A-Z]ID)([0-9A-Z]{7,})/.match(md.post_match)) ||
     raise("Invalid access key ID")
   len = md2.end 0
   raise "Wrong length of access key ID" if len != 11 && !(16..128).member?(len)
+
   tail = md2[2]
   converted = md2[1] + stars(tail.size - 4) + tail[-4, 4]
   md.pre_match + md[0] + converted + md2.post_match

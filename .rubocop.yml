@@ -1,5 +1,12 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.4
+
 Layout/EndOfLine:
   EnforcedStyle: lf
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
