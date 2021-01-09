@@ -5,6 +5,11 @@ def stars(num)
   "*" * num
 end
 
+def masked_id_from(match_data)
+  tail = match_data[2]
+  match_data[1] + stars(tail.size - 4) + tail[-4, 4]
+end
+
 def convert_id_if_possible(line)
   return nil unless (md = /aws_access_key_id\s*=\s*/.match(line))
 
@@ -13,8 +18,7 @@ def convert_id_if_possible(line)
   len = md2.end 0
   raise "Wrong length of access key ID" if len != 11 && !(16..128).member?(len)
 
-  tail = md2[2]
-  converted = md2[1] + stars(tail.size - 4) + tail[-4, 4]
+  converted = masked_id_from(md2)
   md.pre_match + md[0] + converted + md2.post_match
 end
 
