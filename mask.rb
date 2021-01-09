@@ -18,8 +18,7 @@ def convert_id_if_possible(line)
   len = md2.end 0
   raise "Wrong length of access key ID" if len != 11 && !(16..128).member?(len)
 
-  converted = masked_id_from(md2)
-  md.pre_match + md[0] + converted + md2.post_match
+  md.pre_match + md[0] + masked_id_from(md2) + md2.post_match
 end
 
 def convert_line(line)
