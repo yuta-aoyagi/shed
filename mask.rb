@@ -10,7 +10,7 @@ def masked_id_from(match_data)
   match_data[1] + stars(tail.size - 4) + tail[-4, 4]
 end
 
-def convert_id_if_possible(line)
+def mask_id_if_appropriate(line)
   return nil unless (md = /aws_access_key_id\s*=\s*/.match(line))
 
   (md2 = /\A(A3T|A[A-Z]{2}A|A[A-Z]ID)([0-9A-Z]{7,})/.match(md.post_match)) ||
@@ -27,7 +27,7 @@ def convert_line(line)
       raise("Invalid secret access key")
     return md.pre_match + md[0] + stars(40) + md2.post_match
   end
-  convert_id_if_possible(line) || line
+  mask_id_if_appropriate(line) || line
 end
 
 def do_work(input, output)
