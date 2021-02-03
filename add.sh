@@ -15,3 +15,5 @@ aws_access_key_id = $id
 aws_secret_access_key = $secret
 EOS
 }
+
+do_add
