@@ -15,6 +15,7 @@ def mask_id_if_appropriate(line)
 
   (md2 = /\A(A3T|A[A-Z]{2}A|A[A-Z]ID)([0-9A-Z]{7,})/.match(md.post_match)) ||
     raise("Invalid access key ID")
+  # here, line == md.pre_match + md[0] + (md2[1] + md2[2]) + md2.post_match
   len = md2.end 0
   raise "Wrong length of access key ID" if len != 11 && !(16..128).member?(len)
 
@@ -25,6 +26,7 @@ def convert_line(line)
   if (md = /aws_secret_access_key\s*=\s*/.match(line))
     (md2 = %r(\A[0-9A-Za-z+/=]{40}).match(md.post_match)) ||
       raise("Invalid secret access key")
+    # here, line == md.pre_match + md[0] + md2[0] + md2.post_match
     return md.pre_match + md[0] + stars(40) + md2.post_match
   end
   mask_id_if_appropriate(line) || line
