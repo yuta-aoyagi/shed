@@ -1,0 +1,14 @@
+Port 29222
+
+HostKey /etc/opt/openssh/ssh/ssh_host_ed25519_key
+
+PermitRootLogin no
+
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+PermitTTY no
+UsePrivilegeSeparation no # this is sad change
+PidFile /var/opt/openssh/run/sshd.pid
