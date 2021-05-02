@@ -2,8 +2,9 @@ all:
 	echo "usage: make {mount|umount|sshd}" >&2
 
 mount:
-	mount -o acl,binary @drive_letter@:@path_to_another_root@/etc/opt/openssh /etc/opt/openssh
-	mount -o acl,binary @drive_letter@:@path_to_another_root@/var/opt/openssh /var/opt/openssh
+	colon() { printf \\072; } && \
+	  do_mount() { mount -o acl,binary "@drive_letter@`colon`@path_to_another_root@$$1" "$$1"; } && \
+	  do_mount /etc/opt/openssh && do_mount /var/opt/openssh
 
 umount:
 	umount /etc/opt/openssh
