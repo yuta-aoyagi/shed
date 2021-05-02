@@ -1,0 +1,15 @@
+all:
+	echo "usage: make {mount|umount|sshd}" >&2
+
+mount:
+	mount -o acl,binary @drive_letter@:@path_to_another_root@/etc/opt/openssh /etc/opt/openssh
+	mount -o acl,binary @drive_letter@:@path_to_another_root@/var/opt/openssh /var/opt/openssh
+
+umount:
+	umount /etc/opt/openssh
+	umount /var/opt/openssh
+
+sshd:
+	x=`ruby -rtime --disable gems -e 'puts Time.now.utc.iso8601(9).delete("-:")'` && \
+	  nohup ash sshd.sh </dev/null >"/var/opt/openssh/log/$$x-stdout.txt" \
+	  2>"/var/opt/openssh/log/$$x-stderr.txt" &
