@@ -4,7 +4,7 @@ set -u
 
 find_token() {
   # shellcheck disable=SC2006
-  fresh=`find "$token" -mmin 0`
+  fresh=`find "$token" -mmin -1`
 }
 
 msg() {
