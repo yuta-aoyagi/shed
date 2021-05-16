@@ -1,2 +1,2 @@
-/ssh_host_*_key
-/ssh_host_*_key.pub
+/ssh_host_?*_key
+/ssh_host_?*_key.pub
