@@ -1,0 +1,255 @@
+# digraph {
+# 	{ "policy-attacher-to-users"; "cfn-role-operating-iam-groups" } -> "policy-forcing-mfa"
+# 	{
+# 		edge [style=dashed] /* for cfn */
+# 		"policy-attacher-to-users" -> "cfn-role-operating-iam-groups" -> "top-iam"
+# 		"policy-forcing-mfa" -> "top-iam"
+# 	}
+# }
+
+# policy-attacher-to-users.template
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Attach the specified IAM policy to the specified IAM users
+Parameters:
+  PolicysExportName:
+    Type: String
+    Description: The export name for an IAM policy's ARN
+  Scope:
+    Type: String
+    AllowedPattern: ^[\u0021-\u007f]{1,256}$
+    Description: Scope, any non-empty ASCII string
+  Users:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of IAM users to be allowed to operate sbox
+Resources:
+  Group:
+    Type: AWS::IAM::Group
+    Properties:
+      ManagedPolicyArns:
+      - Fn::ImportValue: !Ref PolicysExportName
+      Path: !Sub /${Scope}/
+  AddUserToGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users: !Ref Users
+---
+# cfn-role-operating-iam-groups.template
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Define a CFn service role for operating IAM groups
+Parameters:
+  GroupsDisallowedToOperate:
+    Type: CommaDelimitedList
+    Description: A Resource element in an IAM policy, specifying IAM groups disallowed to operate by the IAM roles to be created by this template. Or empty list if there's no such groups
+  Scope:
+    Type: String
+    AllowedPattern: ^[\u0021-\u007f]{1,256}$
+    Description: Scope, any non-empty ASCII string
+  ScopesPattern:
+    Type: String
+    Description: A matching pattern for scopes, in which you can use * and ?. It SHOULD match with all names of Scopes parameter, and the fewer strings are matched with it, the better.
+  PolicysExportName:
+    Type: String
+    Description: The export name for an IAM policy's ARN
+Conditions:
+  NoGroupsAreSpecified: !Equals
+  - !Join ["", !Ref GroupsDisallowedToOperate]
+  - ""
+Resources:
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: !Sub /${Scope}/
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+          - iam:AddUserToGroup
+          - iam:CreateGroup
+          - iam:DeleteGroup
+          - iam:GetGroup
+          - iam:RemoveUserFromGroup
+          - iam:UpdateGroup
+          Resource: !Sub arn:${AWS::Partition}:iam::*:group/${ScopesPattern}/*
+        - Effect: Allow
+          Action: iam:*tachGroupPolicy
+          Resource: !Sub arn:${AWS::Partition}:iam::*:group/${ScopesPattern}/*
+          Condition:
+            ArnLike:
+              iam:PolicyARN:
+              - Fn::ImportValue: !Ref PolicysExportName
+        - !If
+          - NoGroupsAreSpecified
+          - Effect: Deny
+            Action: "*"
+            NotResource: !Sub arn:${AWS::Partition}:iam::*:group/${ScopesPattern}/*
+          - Effect: Deny
+            Action: "*"
+            Resource: !Ref GroupsDisallowedToOperate
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: cloudformation.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref Policy
+      Path: !Sub /${Scope}/
+      Tags:
+      - Key: scope
+        Value: !Ref Scope
+Outputs:
+  Arn:
+    Description: The ARN for the created CFn service role
+    Value: !GetAtt Role.Arn
+---
+# policy-forcing-mfa.template
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Define an IAM policy forcing MFA on
+Parameters:
+  Scope:
+    Type: String
+    AllowedPattern: ^[\u0021-\u007f]{1,256}$
+    Description: Scope, any non-empty ASCII string
+Resources:
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: !Sub /${Scope}/
+      # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_aws_my-sec-creds-self-manage-mfa-only.html
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Sid: AllowViewAccountInfo
+          Effect: Allow
+          Action: iam:ListVirtualMFADevices
+          Resource: "*"
+        - Effect: Allow
+          Action:
+          - iam:CreateVirtualMFADevice
+          - iam:DeleteVirtualMFADevice
+          Resource: !Sub arn:${AWS::Partition}:iam::*:mfa/${!aws:username}
+        - Effect: Allow
+          Action:
+          - iam:EnableMFADevice
+          - iam:GetUser
+          - iam:ListMFADevices
+          - iam:ResyncMFADevice
+          Resource: !Sub arn:${AWS::Partition}:iam::*:user/${!aws:username}
+        - Effect: Allow
+          Action: iam:DeactivateMFADevice
+          Resource: !Sub arn:${AWS::Partition}:iam::*:user/${!aws:username}
+          Condition:
+            Bool:
+              aws:MultiFactorAuthPresent: true
+        - Sid: DenyAllExceptListedIfNoMFA
+          Effect: Deny
+          NotAction:
+          - iam:CreateVirtualMFADevice
+          - iam:EnableMFADevice
+          - iam:GetUser
+          - iam:ListMFADevices
+          - iam:ListVirtualMFADevices
+          - iam:ResyncMFADevice
+          - sts:GetSessionToken
+          Resource: "*"
+          Condition:
+            BoolIfExists:
+              aws:MultiFactorAuthPresent: false
+Outputs:
+  Arn:
+    Description: The ARN for the created IAM policy
+    Value: !Ref Policy
+    Export:
+      Name: !Sub ${AWS::StackName}-Arn
+---
+# top-iam.template
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Define a CFn service role for operating IAM policies and roles
+Parameters:
+  Scopes:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of scopes' or projects' names
+  ScopesPattern:
+    Type: String
+    Description: A matching pattern for scopes, in which you can use * and ?. It SHOULD match with all names of Scopes parameter, and the fewer strings are matched with it, the better.
+Resources:
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action: iam:AttachRolePolicy
+          Resource: !Sub arn:${AWS::Partition}:iam::*:role/${ScopesPattern}/*
+          Condition:
+            ArnLike:
+              iam:PolicyARN: !Sub arn:${AWS::Partition}:iam::*:policy/${ScopesPattern}/*
+            StringEqualsIfExists:
+              iam:ResourceTag/scope: !Ref Scopes
+        - Effect: Allow
+          Action:
+          - iam:CreatePolicy*
+          - iam:DeletePolicy*
+          - iam:GetPolicy
+          - iam:ListPolicyVersions
+          Resource: !Sub arn:${AWS::Partition}:iam::*:policy/${ScopesPattern}/*
+        - Effect: Allow
+          Action:
+          - iam:CreateRole
+          Resource: !Sub arn:${AWS::Partition}:iam::*:role/${ScopesPattern}/*
+          Condition:
+            StringEqualsIfExists:
+              aws:RequestTag/scope: !Ref Scopes
+            ForAllValues:StringLike:
+              aws:TagKeys:
+              - aws:cloudformation:*
+              - scope
+        - Effect: Allow
+          Action:
+          - iam:DeleteRole
+          - iam:GetRole
+          Resource: !Sub arn:${AWS::Partition}:iam::*:role/${ScopesPattern}/*
+          Condition:
+            StringEquals:
+              iam:ResourceTag/scope: !Ref Scopes
+        - Effect: Allow
+          Action: iam:DetachRolePolicy
+          Resource: !Sub arn:${AWS::Partition}:iam::*:role/${ScopesPattern}/*
+          Condition:
+            ArnLike:
+              iam:PolicyARN: !Sub arn:${AWS::Partition}:iam::*:policy/${ScopesPattern}/*
+            StringEquals:
+              iam:ResourceTag/scope: !Ref Scopes
+        - Effect: Allow
+          Action: iam:TagRole
+          Resource: !Sub arn:${AWS::Partition}:iam::*:role/${ScopesPattern}/*
+          Condition:
+            StringEquals:
+              aws:RequestTag/scope: !Ref Scopes
+            ForAllValues:StringLike:
+              aws:TagKeys:
+              - aws:cloudformation:*
+              - scope
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: cloudformation.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref Policy
+Outputs:
+  Arn:
+    Description: The ARN for the created CFn service role
+    Value: !GetAtt Role.Arn
