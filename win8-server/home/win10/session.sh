@@ -2,6 +2,8 @@
 
 set -u
 
+MY_DIR=win10
+
 find_token() {
   # shellcheck disable=SC2006
   fresh=`find "$token" -mmin -1`
@@ -13,7 +15,7 @@ msg() {
 }
 
 consume() {
-  token=win10/$1
+  token=$MY_DIR/$1
   if find_token; then
     if [ "$fresh" ]; then
       rm "$token" || msg "shouldn't reach here"
@@ -38,5 +40,5 @@ ts_rb() {
 }
 
 # shellcheck disable=SC2006
-log_file=win10/`date -u +%Y-%m-%d`.log
+log_file=$MY_DIR/`date -u +%Y-%m-%d`.log
 { do_work 2>&1 >&5 5>&- | ts_rb 5>&- | tee -a "$log_file" >&2; } 5>&1
