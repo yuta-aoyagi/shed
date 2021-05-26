@@ -6,7 +6,7 @@ MY_DIR=win10
 
 find_token() {
   # shellcheck disable=SC2006
-  fresh=`find "$token" -mmin -1`
+  fresh=`find "$MY_DIR" -path "$token" -mmin -1`
 }
 
 msg() {
