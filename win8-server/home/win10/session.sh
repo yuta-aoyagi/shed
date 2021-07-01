@@ -27,10 +27,18 @@ consume() {
   fi
 }
 
+do_get() {
+  cat /dev/clipboard
+}
+
+do_put() {
+  cat >/dev/clipboard
+}
+
 do_work() {
   case $SSH_ORIGINAL_COMMAND in
-    get) consume get && cat /dev/clipboard ;;
-    put) consume put && cat >/dev/clipboard ;;
+    get) consume get && do_get ;;
+    put) consume put && do_put ;;
     *) msg "unknown command: $SSH_ORIGINAL_COMMAND"
   esac
 }
