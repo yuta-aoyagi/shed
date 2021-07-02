@@ -35,10 +35,14 @@ do_put() {
   cat >/dev/clipboard
 }
 
+process() {
+  consume "$1" && $2
+}
+
 dispatch() {
   case $1 in
-    get) consume get && do_get ;;
-    put) consume put && do_put ;;
+    get) process get do_get ;;
+    put) process put do_put ;;
     *) msg "unknown command: $1"
   esac
 }
