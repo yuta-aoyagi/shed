@@ -35,12 +35,16 @@ do_put() {
   cat >/dev/clipboard
 }
 
-do_work() {
-  case $SSH_ORIGINAL_COMMAND in
+dispatch() {
+  case $1 in
     get) consume get && do_get ;;
     put) consume put && do_put ;;
-    *) msg "unknown command: $SSH_ORIGINAL_COMMAND"
+    *) msg "unknown command: $1"
   esac
+}
+
+do_work() {
+  dispatch "$SSH_ORIGINAL_COMMAND"
 }
 
 ts_rb() {
