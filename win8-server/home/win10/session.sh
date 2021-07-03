@@ -9,7 +9,7 @@ find_token() {
   fresh=`find "$MY_DIR" -path "$token" -mmin -1`
 }
 
-msg() {
+on_error() {
   printf '%s\n' "$1" >&2
   false
 }
@@ -18,12 +18,12 @@ consume() {
   token=$MY_DIR/$1
   if find_token; then
     if [ "$fresh" ]; then
-      rm "$token" || msg "shouldn't reach here"
+      rm "$token" || on_error "shouldn't reach here"
     else
-      msg "you don't have one-time token"
+      on_error "you don't have one-time token"
     fi
   else
-    msg "shouldn't reach here"
+    on_error "shouldn't reach here"
   fi
 }
 
@@ -43,7 +43,7 @@ dispatch() {
   case $1 in
     get) process get do_get ;;
     put) process put do_put ;;
-    *) msg "unknown command: $1"
+    *) on_error "unknown command: $1"
   esac
 }
 
