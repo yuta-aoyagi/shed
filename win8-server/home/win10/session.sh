@@ -4,13 +4,17 @@ set -u
 
 MY_DIR=win10
 
+msg() {
+  printf '%s\n' "$1" >&2
+}
+
 find_token() {
   # shellcheck disable=SC2006
   fresh=`find "$MY_DIR" -path "$token" -mmin -1`
 }
 
 on_error() {
-  printf '%s\n' "$1" >&2
+  msg "$1"
   false
 }
 
