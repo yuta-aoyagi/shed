@@ -1,0 +1,6 @@
+#cloud-config
+ssh_authorized_keys:
+  - ssh-ed25519 @ed25519_public_key_material@
+runcmd:
+  - [ printf, "Hello, world from cloud-init at:" ]
+  - [ env, LANG=C, date ]
