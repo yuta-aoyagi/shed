@@ -1,6 +1,9 @@
 #cloud-config
+# ssh:
+#   emit_keys_to_console: true
 ssh_authorized_keys:
   - ssh-ed25519 @ed25519_public_key_material@
 runcmd:
+  - 'for f in /etc/ssh/ssh_host_?*_key.pub; do printf %s\\n "$f" && ssh-keygen -lf "$f"; done | curl -SsH "Cotent-Type: text/plain" --data-binary @- http://10.0.2.2:30080/data'
   - [ printf, "Hello, world from cloud-init at:" ]
   - [ env, LANG=C, date ]

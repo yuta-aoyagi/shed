@@ -10,6 +10,7 @@ help:
 
 srv:
 	cd seed; python -m http.server $(SEED_PORT) &
+	ruby -W receiver.rb &
 
 disk: $(DISK)
 
