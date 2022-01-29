@@ -3,13 +3,18 @@ DISK = try.qcow2
 SEED_PORT = 20080
 SSH_PORT = 20022
 
+all: help
+
+help:
+	@echo "usage: make {all|help|srv|disk|run|ssh}" >&2
+
 srv:
 	cd seed; python -m http.server $(SEED_PORT) &
 
 disk: $(DISK)
 
 $(DISK):
-	sh mingw.sh "$(QEMU)/build/qemu-img" create -f qcow2 -b "/Users/$$USERNAME/Downloads/amzn2-kvm-2.0.20211201.0-x86_64.xfs.gpt.qcow2" -F qcow2 $@
+	sh mingw.sh "$(QEMU)/build/qemu-img" create -f qcow2 -b "/Users/$$USERNAME/Downloads/amzn2-kvm-2.0.20211201.0-x86_64.xfs.gpt.qcow2" -F qcow2 "$@"
 
 run:
 	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
