@@ -17,4 +17,19 @@ $(DISK): $(ORIG_DISK)
 $(ORIG_DISK): $(ORIG_DISK_GZ)
 	printf "a1d1416bb456815ec7c4543df08f0eb81d365796042c562e40a46ab07b0d514c *%s\\n" "$<" | \
 	    sha256sum -c --strict
-	zcat "$<" >"$@"
+	try_zcat() { \
+	  set +e && { zcat "$<" >"$@"; } 2>&1; ret=$$?; echo X && return $$ret; \
+	} && \
+	expected() { \
+	  LF=`echo && echo _` && LF=$${LF%_} && \
+	  exp="$${LF}gzip: $<: decompression OK, trailing garbage ignored$$LF" && \
+	  [ "$$exp" = "$${msgX%X}" ]; \
+	} && \
+	if msgX=`try_zcat`; then \
+	  printf %s "$${msgX%X}" >&2; \
+	elif ret=$$? && [ $$ret = 2 ] && expected; then \
+	  echo a known warning is ignored. >&2; \
+	else \
+	  printf %s "$${msgX%X}" >&2 && \
+	      set_status() { return "$$1"; } && set_status $$ret; \
+	fi
