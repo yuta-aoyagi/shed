@@ -1,6 +1,7 @@
 #!/usr/bin/ruby -W
 
 require "English"
+require "irb"
 require "socket"
 
 module VMDriver
@@ -12,7 +13,6 @@ end
 def do_work(vm_driver, port)
   vm_driver.srv = TCPServer.new "::1", port
 
-  require "irb"
   IRB.start __FILE__
 end
 
