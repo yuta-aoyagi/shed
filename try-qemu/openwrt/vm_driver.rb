@@ -7,11 +7,19 @@ require "logger"
 require "socket"
 require "time"
 
-module VMDriver
+class VMDriver
   class <<self
     attr_accessor :srv, :todo
   end
 end
+
+# The highlighted entry will be executed automatically in 5s. <- GRUB
+# "Press the [f] key and hit [enter] to enter failsafe mode\r\nPress the [1], [2], [3] or [4] key and hit [enter] to select the debug level\r\n" <- /lib/preinit/30_failsafe_wait
+# Please press Enter to activate this console.\r\n <- Busybox init askfirst
+# (net device `link becomes ready`?)
+# "\r\nroot@OpenWrt:/# "
+
+# network.lan=interface\r\nnetwork.lan.device='br-lan'\r\nnetwork.lan.proto='static'\r\nnetwork.lan.ipaddr='192.168.1.1'\r\nnetwork.lan.netmask='255.255.255.0'\r\nnetwork.lan.ip6assign='60'\r\n
 
 ACCEPTED = "accepted".freeze
 
@@ -42,6 +50,7 @@ def recv_thread(sock, logger, kernel)
     s = sock.readpartial(1024).inspect.gsub '\n', "\n"
     logger.debug s
   end
+  scok.close
 end
 
 def do_work(vm_driver, port, err_out, kernel)
