@@ -15,5 +15,6 @@ $(DISK): $(ORIG_DISK)
 	$(QEMU_IMG) create -f qcow2 -b "$<" "$@"
 
 $(ORIG_DISK): $(ORIG_DISK_GZ)
-	echo "a1d1416bb456815ec7c4543df08f0eb81d365796042c562e40a46ab07b0d514c *$(ORIG_DISK_GZ)" | sha256sum -c --strict
+	echo "a1d1416bb456815ec7c4543df08f0eb81d365796042c562e40a46ab07b0d514c *$<" | \
+	    sha256sum -c --strict
 	zcat "$<" >"$@"
