@@ -4,6 +4,7 @@ require "English"
 require "irb"
 require "logger"
 require "socket"
+require "time"
 
 module VMDriver
   class <<self
@@ -13,8 +14,24 @@ end
 
 ACCEPTED = "accepted".freeze
 
+class LogFormatter
+  def initialize
+    @base = nil
+  end
+
+  def call(severity, time, progname, msg)
+    time_str = time.dup.utc.iso8601 9
+    @base = time if !@base && msg == ACCEPTED
+    diff = @base ? (time - @base).to_s : "N/A"
+    msg_str = msg.is_a?(String) ? msg : msg.inspect
+    "[%s (%s) #%d] %5s: %s\n" % [time_str, diff, $$, severity, msg_str]
+  end
+end
+
 def create_logger(err_out)
-  Logger.new err_out
+  l = Logger.new err_out
+  l.formatter = LogFormatter.new
+  l
 end
 
 def recv_thread(sock, logger, kernel)
