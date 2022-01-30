@@ -7,7 +7,7 @@ ORIG_DISK_GZ = /mnt/c/Users/$(USERNAME)/Downloads/openwrt-21.02.1-x86-64-generic
 all: help # TODO: replace later
 
 help:
-	@echo "usage: make [all|help|disk]" >&2
+	@echo "usage: make [all|help|disk|info|run]" >&2
 
 disk: $(DISK)
 
@@ -33,3 +33,10 @@ $(ORIG_DISK): $(ORIG_DISK_GZ)
 	  printf %s "$${msgX%X}" >&2 && \
 	      set_status() { return "$$1"; } && set_status $$ret; \
 	fi
+
+info: $(DISK)
+	$(QEMU_IMG) info --backing-chain "$(DISK)"
+
+run:
+	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
+	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -nographic -L "$$l_arg" "$(DISK)"
