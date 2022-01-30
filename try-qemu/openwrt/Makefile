@@ -13,7 +13,7 @@ help:
 disk: $(DISK)
 
 $(DISK): $(ORIG_DISK_QCOW2)
-	$(QEMU_IMG) create -f qcow2 -b "$<" "$@"
+	$(QEMU_IMG) create -f qcow2 -b "$<" -F qcow2 "$@"
 
 $(ORIG_DISK_QCOW2): $(ORIG_DISK)
 	$(QEMU_IMG) convert -c -O qcow2 "$<" "$@"
