@@ -17,6 +17,7 @@ $(DISK): $(ORIG_DISK_QCOW2)
 
 $(ORIG_DISK_QCOW2): $(ORIG_DISK)
 	$(QEMU_IMG) convert -c -O qcow2 "$<" "$@"
+	$(QEMU_IMG) compare -s "$<" "$@" || $(QEMU_IMG) compare "$<" "$@"
 
 $(ORIG_DISK): $(ORIG_DISK_GZ)
 	printf "a1d1416bb456815ec7c4543df08f0eb81d365796042c562e40a46ab07b0d514c *%s\\n" "$<" | \
