@@ -28,7 +28,7 @@ end
 def do_work(vm_driver, port, err_out, kernel)
   l = create_logger err_out
   l.info "start"
-  vm_driver.srv = srv = TCPServer.new "::1", port
+  vm_driver.srv = srv = TCPServer.new "127.0.0.1", port
   s = srv.accept
   l.info ACCEPTED
   th = Thread.new { recv_thread s, l, kernel }
