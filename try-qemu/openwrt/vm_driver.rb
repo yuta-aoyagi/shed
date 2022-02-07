@@ -30,7 +30,7 @@ class LogFormatter
 
   def call(severity, time, progname, msg)
     time_str = time.dup.utc.iso8601 9
-    @base = time if !@base && msg == ACCEPTED
+    @base = time.dup if !@base && msg == ACCEPTED
     diff = @base ? (time - @base).to_s : "N/A"
     msg_str = msg.is_a?(String) ? msg : msg.inspect
     "[%s (%s) #%d] %5s: %s\n" % [time_str, diff, $$, severity, msg_str]
