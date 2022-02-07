@@ -50,7 +50,7 @@ def recv_thread(sock, logger, kernel)
     s = sock.readpartial(1024).inspect.gsub '\n', "\n"
     logger.debug s
   end
-  scok.close
+  sock.close
 end
 
 def do_work(vm_driver, port, err_out, kernel)
