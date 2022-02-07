@@ -47,7 +47,7 @@ def recv_thread(sock, logger, kernel)
   logger.info sock.expect(/press enter to activate this console/i, 120)
   while !sock.closed? && !sock.eof?
     kernel.sleep 0.1
-    s = sock.readpartial(1024).inspect.gsub '\n', "\n"
+    s = sock.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
     logger.debug s
   end
   sock.close
