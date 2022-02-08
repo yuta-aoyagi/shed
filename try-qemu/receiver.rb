@@ -1,4 +1,5 @@
 #!/usr/bin/ruby -W
+# frozen_string_literal: true
 
 require "English"
 require "logger"
