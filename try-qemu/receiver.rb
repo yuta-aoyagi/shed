@@ -5,6 +5,7 @@ require "English"
 require "logger"
 require "webrick"
 
+# Servlet recording request body from receiving requests.
 class MyHandler
   def initialize(logger)
     @logger = logger
