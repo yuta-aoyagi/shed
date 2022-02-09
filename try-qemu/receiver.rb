@@ -33,7 +33,7 @@ end
 
 def do_work(err, signal)
   handler = MyHandler.new Logger.new(err)
-  srv = WEBrick::HTTPServer.new :Port => 30080
+  srv = WEBrick::HTTPServer.new :Port => "30080"
   srv.mount_proc("/data", &handler.method(:service))
   signal.trap(:INT) { srv.shutdown }
   srv.start
