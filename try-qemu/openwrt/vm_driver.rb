@@ -37,7 +37,8 @@ class LogFormatter
     @base = time.dup if !@base && msg == ACCEPTED
     diff = @base ? (time - @base).to_s : "N/A"
     msg_str = msg.is_a?(String) ? msg : msg.inspect
-    "[%s (%s) #%d] %5s: %s\n" % [time_str, diff, $$, severity, msg_str]
+    svr = format "%5s", severity
+    "[#{time_str} (#{diff}) \##{$PID}] #{svr}: #{msg_str}\n"
   end
 end
 
