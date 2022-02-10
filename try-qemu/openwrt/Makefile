@@ -45,3 +45,10 @@ info: $(DISK)
 run:
 	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
 	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -nographic -L "$$l_arg" "$(DISK)"
+
+drv:
+	ruby -W vm_driver.rb
+
+run2:
+	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
+	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -nographic -serial tcp:127.0.0.1:4444 -L "$$l_arg" "$(DISK)"
