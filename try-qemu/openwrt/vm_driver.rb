@@ -43,20 +43,33 @@ class LogFormatter
   end
 end
 
+# Handles the VM's serial output.
+class RxThread
+  def self.start(sock, logger, kernel)
+    Thread.new { new(sock, logger, kernel).call }
+  end
+
+  def initialize(sock, logger, kernel)
+    @sock = sock
+    @logger = logger
+    @kernel = kernel
+  end
+
+  def call
+    @logger.info @sock.expect(/press enter to activate this console/i, 120)
+    while !@sock.closed? && !@sock.eof?
+      @kernel.sleep 0.1
+      s = @sock.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
+      @logger.debug s
+    end
+    @sock.close
+  end
+end
+
 def create_logger(err_out)
   l = Logger.new err_out
   l.formatter = LogFormatter.new
   l
-end
-
-def recv_thread(sock, logger, kernel)
-  logger.info sock.expect(/press enter to activate this console/i, 120)
-  while !sock.closed? && !sock.eof?
-    kernel.sleep 0.1
-    s = sock.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
-    logger.debug s
-  end
-  sock.close
 end
 
 def do_work(vm_driver, port, err_out, kernel)
@@ -65,7 +78,7 @@ def do_work(vm_driver, port, err_out, kernel)
   vm_driver.srv = srv = TCPServer.new "127.0.0.1", port
   s = srv.accept
   l.info ACCEPTED
-  th = Thread.new { recv_thread s, l, kernel }
+  th = RxThread.start s, l, kernel
   vm_driver.todo = { :l => l, :s => s, :th => th }
 
   IRB.start __FILE__
