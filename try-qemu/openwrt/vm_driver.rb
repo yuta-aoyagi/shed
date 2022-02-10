@@ -57,6 +57,12 @@ class RxThread
 
   def call
     @logger.info @sock.expect(/press enter to activate this console/i, 120)
+    dump_rest
+  end
+
+  private
+
+  def dump_rest
     while !@sock.closed? && !@sock.eof?
       @kernel.sleep 0.1
       s = @sock.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
