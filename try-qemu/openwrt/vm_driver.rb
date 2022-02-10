@@ -25,7 +25,7 @@ end
 # network.lan=interface\r\nnetwork.lan.device='br-lan'\r\nnetwork.lan.proto='static'\r\n
 # network.lan.ipaddr='192.168.1.1'\r\nnetwork.lan.netmask='255.255.255.0'\r\nnetwork.lan.ip6assign='60'\r\n
 
-ACCEPTED = "accepted".freeze
+ACCEPTED = "accepted".freeze # rubocop:disable Style/RedundantFreeze
 
 class LogFormatter
   def initialize
