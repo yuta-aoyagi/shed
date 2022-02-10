@@ -27,6 +27,7 @@ end
 
 ACCEPTED = "accepted".freeze # rubocop:disable Style/RedundantFreeze
 
+# Formats log lines with the time elapsed from the moment ACCEPTED comes.
 class LogFormatter
   def initialize
     @base = nil
