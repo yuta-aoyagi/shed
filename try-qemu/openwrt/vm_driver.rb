@@ -31,7 +31,7 @@ class LogFormatter
     @base = nil
   end
 
-  def call(severity, time, progname, msg)
+  def call(severity, time, _progname, msg)
     time_str = time.dup.utc.iso8601 9
     @base = time.dup if !@base && msg == ACCEPTED
     diff = @base ? (time - @base).to_s : "N/A"
