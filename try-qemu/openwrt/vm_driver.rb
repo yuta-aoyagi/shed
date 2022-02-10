@@ -68,6 +68,7 @@ class RxThread
       s = @sock.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
       @logger.debug s
     end
+  ensure
     @sock.close
   end
 end
