@@ -55,12 +55,57 @@ class RxThread
     @kernel = kernel
   end
 
+  # assuming that link always becomes ready enough after consoles start
+  # waiting for enter key.
   def call
-    @logger.info @sock.expect(/press enter to activate this console/i, 120)
+    expect_kernel_loaded &&
+      my_expect(/press enter to activate this console.{1,4}\n/i, 90) &&
+      expect_link_ready(90) &&
+      activate_console && ifup
     dump_rest
+  ensure
+    @logger.info "rx finished"
   end
 
   private
+
+  def expect_kernel_loaded
+    my_expect(/the highlighted entry will be [a-z]+ automatically/i, 10) &&
+      my_expect(/^\[ *\d+\.\d+\]/, 40) &&
+      my_expect(/linux version \d+\.\d+/i, 1)
+  end
+
+  def activate_console
+    @sock << "\n"
+    expect_prompt 10
+  end
+
+  # thanks much to
+  # https://github.com/mcandre/packer-templates/blob/master/openwrt/openwrt-amd64.json
+  # https://openwrt.org/docs/guide-user/network/openwrt_as_clientdevice
+  IFUP = "uci set network.lan.proto=dhcp && " \
+         "uci delete network.lan.ipaddr && " \
+         "uci delete network.lan.netmask && " \
+         "uci delete network.lan.ip6assign && uci commit && ifup lan\n"
+  IFUP.freeze
+
+  def ifup
+    @sock << IFUP
+    expect_prompt(30) && expect_link_ready(120)
+  end
+
+  def expect_link_ready(timeout)
+    my_expect "br-lan: link becomes ready", timeout
+  end
+
+  def expect_prompt(timeout)
+    my_expect %r{^root@[A-Za-z]+:/# }, timeout
+  end
+
+  def my_expect(pat, timeout)
+    @logger.info(x = @sock.expect(pat, timeout))
+    x
+  end
 
   def dump_rest
     while !@sock.closed? && !@sock.eof?
