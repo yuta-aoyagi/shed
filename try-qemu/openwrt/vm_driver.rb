@@ -94,8 +94,11 @@ class RxThread
     expect_prompt(30) && expect_link_ready(120)
   end
 
+  LINK_READY = "br-lan: link becomes ready"
+  LINK_READY.freeze
+
   def expect_link_ready(timeout)
-    my_expect "br-lan: link becomes ready", timeout
+    my_expect LINK_READY, timeout
   end
 
   def expect_prompt(timeout)
