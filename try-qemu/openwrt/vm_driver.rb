@@ -80,17 +80,9 @@ class RxThread
     expect_prompt 10
   end
 
-  # thanks much to
-  # https://github.com/mcandre/packer-templates/blob/master/openwrt/openwrt-amd64.json
-  # https://openwrt.org/docs/guide-user/network/openwrt_as_clientdevice
-  IFUP = "uci set network.lan.proto=dhcp && " \
-         "uci delete network.lan.ipaddr && " \
-         "uci delete network.lan.netmask && " \
-         "uci delete network.lan.ip6assign && uci commit && ifup lan\n"
-  IFUP.freeze
-
   def ifup
-    @sock << IFUP
+    empty = ""
+    @sock << IO.readlines("ifup.sh").grep(/^[^\n#]/).join(empty)
     expect_prompt(30) && expect_link_ready(120)
   end
 
