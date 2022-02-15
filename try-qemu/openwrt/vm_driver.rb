@@ -58,16 +58,20 @@ class RxThread
   # assuming that link always becomes ready enough after consoles start
   # waiting for enter key.
   def call
-    expect_kernel_loaded(40) &&
-      my_expect(/press enter to activate this console.{1,4}\n/i, 90) &&
-      expect_link_ready(90) &&
-      activate_console && ifup
+    expect_fully_booted(40) && ifup
     dump_rest
   ensure
     @logger.info "rx finished"
   end
 
   private
+
+  def expect_fully_booted(timeout)
+    expect_kernel_loaded(timeout) &&
+      my_expect(/press enter to activate this console.{1,4}\n/i, 90) &&
+      expect_link_ready(90) &&
+      activate_console
+  end
 
   def expect_kernel_loaded(timeout)
     my_expect(/the highlighted entry will be [a-z]+ automatically/i, 10) &&
