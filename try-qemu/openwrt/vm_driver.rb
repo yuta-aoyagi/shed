@@ -56,7 +56,8 @@ class RxThread
   end
 
   def call
-    expect_fully_booted(40) && ifup
+    expect_fully_booted(40) && ifup && expand_rootfs &&
+      expect_fully_booted(390)
     dump_rest
   ensure
     @logger.info "rx finished"
@@ -99,6 +100,15 @@ class RxThread
 
   def expect_prompt(timeout)
     my_expect %r{^root@[A-Za-z]+:/# }, timeout
+  end
+
+  def expand_rootfs
+    s = "f() { wget -P ~ http://10.0.2.2:40080/expand-rootfs.sh; } &&\n" \
+        "  f || { sleep 3 && f; } && sh -eu -x ~/expand-rootfs.sh\n"
+    @sock << s
+    [30, 220, 170].each { |n| return nil unless my_expect(/^\+ /, n) }
+    my_expect("was not cleanly unmounted", 6) &&
+      my_expect(" machine restart", 70)
   end
 
   def my_expect(pat, timeout)
