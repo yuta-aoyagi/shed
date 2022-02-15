@@ -70,8 +70,12 @@ class RxThread
   private
 
   def expect_kernel_loaded
+    expect_kernel_loaded_within 40
+  end
+
+  def expect_kernel_loaded_within(timeout)
     my_expect(/the highlighted entry will be [a-z]+ automatically/i, 10) &&
-      my_expect(/^\[ *\d+\.\d+\]/, 40) &&
+      my_expect(/^\[ *\d+\.\d+\]/, timeout) &&
       my_expect(/linux version \d+\.\d+/i, 1)
   end
 
