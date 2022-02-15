@@ -55,8 +55,6 @@ class RxThread
     @kernel = kernel
   end
 
-  # assuming that link always becomes ready enough after consoles start
-  # waiting for enter key.
   def call
     expect_fully_booted(40) && ifup
     dump_rest
@@ -66,6 +64,8 @@ class RxThread
 
   private
 
+  # assuming that link always becomes ready enough after consoles start
+  # waiting for enter key.
   def expect_fully_booted(timeout)
     expect_kernel_loaded(timeout) &&
       my_expect(/press enter to activate this console.{1,4}\n/i, 90) &&
