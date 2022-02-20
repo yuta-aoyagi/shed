@@ -49,6 +49,9 @@ run:
 drv:
 	ruby -W vm_driver.rb
 
+srv:
+	cd http; python -m http.server 40080 &
+
 run2:
 	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
 	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -nographic -serial tcp:127.0.0.1:4444 -L "$$l_arg" "$(DISK)"
