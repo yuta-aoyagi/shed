@@ -36,7 +36,10 @@ println_boot() {
 DISK=`println_boot | sed 's/[0-9].*$//'`
 PART=`println_boot | sed 's/.*[^0-9]//'`
 PART=`expr "$PART" + 1`
+export ROOT
 ROOT=$DISK$PART
+
+"$@" # Before fdisk, run the given command as a hook.
 
 filter_root() {
   sed -n "\\|^${ROOT}[	 ]*|s///p"

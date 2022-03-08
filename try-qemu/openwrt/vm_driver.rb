@@ -57,7 +57,7 @@ class RxThread
 
   def call
     expect_fully_booted(40) && ifup && expand_rootfs &&
-      expect_fully_booted(390)
+      # expect_fully_booted(390)
     dump_rest
   ensure
     @logger.info "rx finished"
@@ -103,12 +103,14 @@ class RxThread
   end
 
   def expand_rootfs
+    hook = %(sh -c 'opkg install tune2fs && tune2fs -j "$ROOT"')
     s = "f() { wget -P ~ http://10.0.2.2:40080/expand-rootfs.sh; } &&\n" \
-        "  f || { sleep 3 && f; } && sh -eu -x ~/expand-rootfs.sh\n"
+        "  f || { sleep 3 && f; } && sh -eu -x ~/expand-rootfs.sh #{hook}\n"
     @sock << s
     [30, 220, 170].each { |n| return nil unless my_expect(/^\+ /, n) }
-    my_expect("was not cleanly unmounted", 6) &&
-      my_expect(" machine restart", 70)
+    # my_expect("was not cleanly unmounted", 6) &&
+    #   my_expect(" machine restart", 70)
+    true
   end
 
   def my_expect(pat, timeout)
