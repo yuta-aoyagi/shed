@@ -102,11 +102,15 @@ class RxThread
     my_expect %r{^root@[A-Za-z]+:/# }, timeout
   end
 
+  ER = <<-'SHELL'.gsub(/^    /, "").freeze
+    f() { wget -P ~ http://10.0.2.2:40080/expand-rootfs.sh; } &&
+      f || { sleep 3 && f; } &&
+      sh -eu -x ~/expand-rootfs.sh \
+        sh -c 'opkg install tune2fs && tune2fs -j "$ROOT"'
+  SHELL
+
   def expand_rootfs
-    hook = %(sh -c 'opkg install tune2fs && tune2fs -j "$ROOT"')
-    s = "f() { wget -P ~ http://10.0.2.2:40080/expand-rootfs.sh; } &&\n" \
-        "  f || { sleep 3 && f; } && sh -eu -x ~/expand-rootfs.sh #{hook}\n"
-    @sock << s
+    @sock << ER
     [30, 220, 170].each { |n| return nil unless my_expect(/^\+ /, n) }
     # my_expect("was not cleanly unmounted", 6) &&
     #   my_expect(" machine restart", 70)
