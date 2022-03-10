@@ -57,7 +57,7 @@ class RxThread
 
   def call
     expect_fully_booted(40) && ifup && expand_rootfs &&
-      # expect_fully_booted(390)
+      expect_fully_booted(390)
     dump_rest
   ensure
     @logger.info "rx finished"
@@ -112,9 +112,10 @@ class RxThread
   def expand_rootfs
     @sock << ER
     [30, 220, 170].each { |n| return nil unless my_expect(/^\+ /, n) }
-    # my_expect("was not cleanly unmounted", 6) &&
-    #   my_expect(" machine restart", 70)
-    true
+    my_expect(/^Installing tune2fs \([-.0-9]+\) to .+\.\.\./, 40) &&
+      my_expect(/^tune2fs \d+\.\d+/, 30) &&
+      my_expect("was not cleanly unmounted", 6) &&
+      my_expect(" machine restart", 70)
   end
 
   def my_expect(pat, timeout)
