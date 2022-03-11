@@ -98,10 +98,6 @@ class RxThread
     my_expect LINK_READY, timeout
   end
 
-  def expect_prompt(timeout)
-    my_expect %r{^root@[A-Za-z]+:/# }, timeout
-  end
-
   ER = <<-'SHELL'.gsub(/^    /, "").freeze
     f() { wget -P ~ http://10.0.2.2:40080/expand-rootfs.sh; } &&
       f || { sleep 3 && f; } &&
@@ -116,6 +112,10 @@ class RxThread
       my_expect(/^tune2fs \d+\.\d+/, 30) &&
       my_expect("was not cleanly unmounted", 6) &&
       my_expect(" machine restart", 70)
+  end
+
+  def expect_prompt(timeout)
+    my_expect %r{^root@[A-Za-z]+:/# }, timeout
   end
 
   def my_expect(pat, timeout)
