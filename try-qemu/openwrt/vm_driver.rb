@@ -81,14 +81,13 @@ class RxThread
   end
 
   def activate_console
-    @sock << "\n"
-    expect_prompt 10
+    send_and_wait "\n", 10
   end
 
   def ifup
     empty = ""
-    @sock << IO.readlines("ifup.sh").grep(/^[^\n#]/).join(empty)
-    expect_prompt(30) && expect_link_ready(120)
+    send_and_wait(IO.readlines("ifup.sh").grep(/^[^\n#]/).join(empty), 30) &&
+      expect_link_ready(120)
   end
 
   LINK_READY = "br-lan: link becomes ready"
@@ -112,6 +111,11 @@ class RxThread
       my_expect(/^tune2fs \d+\.\d+/, 30) &&
       my_expect("was not cleanly unmounted", 6) &&
       my_expect(" machine restart", 70)
+  end
+
+  def send_and_wait(buf, timeout)
+    @sock << buf
+    expect_prompt timeout
   end
 
   def expect_prompt(timeout)
