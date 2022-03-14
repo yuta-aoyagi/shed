@@ -57,7 +57,7 @@ class RxThread
 
   def call
     expect_fully_booted(40) && ifup && expand_rootfs &&
-      expect_fully_booted(390)
+      expect_fully_booted(390) && install_docker
     dump_rest
   ensure
     @logger.info "rx finished"
@@ -111,6 +111,16 @@ class RxThread
       my_expect(/^tune2fs \d+\.\d+/, 30) &&
       my_expect("was not cleanly unmounted", 6) &&
       my_expect(" machine restart", 70)
+  end
+
+  def install_docker
+    return nil unless send_and_wait "opkg update\n", 220
+
+    @sock << "opkg install runc\n"
+    my_expect(/^Configuring runc/, 150) && expect_prompt(2) &&
+      send_and_wait("opkg install containerd\n", 980) &&
+      send_and_wait("opkg install dockerd\n", 870) &&
+      send_and_wait("opkg install docker\n", 310)
   end
 
   def send_and_wait(buf, timeout)
