@@ -43,6 +43,21 @@ class LogFormatter
   end
 end
 
+# Dumps the specified IO's content to a logger.
+module IODumper
+  module_function
+
+  def dump(io, logger, kernel)
+    while !io.closed? && !io.eof?
+      kernel.sleep 0.1
+      s = io.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
+      logger.debug s
+    end
+  ensure
+    io.close
+  end
+end
+
 # Handles the VM's serial output.
 class RxThread
   def self.start(sock, logger, kernel)
@@ -138,17 +153,7 @@ class RxThread
   end
 
   def dump_rest
-    dump @sock, @logger, @kernel
-  end
-
-  def dump(io, logger, kernel)
-    while !io.closed? && !io.eof?
-      kernel.sleep 0.1
-      s = io.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
-      logger.debug s
-    end
-  ensure
-    io.close
+    IODumper.dump @sock, @logger, @kernel
   end
 end
 
