@@ -138,13 +138,17 @@ class RxThread
   end
 
   def dump_rest
-    while !@sock.closed? && !@sock.eof?
-      @kernel.sleep 0.1
-      s = @sock.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
-      @logger.debug s
+    dump @sock, @logger, @kernel
+  end
+
+  def dump(io, logger, kernel)
+    while !io.closed? && !io.eof?
+      kernel.sleep 0.1
+      s = io.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
+      logger.debug s
     end
   ensure
-    @sock.close
+    io.close
   end
 end
 
