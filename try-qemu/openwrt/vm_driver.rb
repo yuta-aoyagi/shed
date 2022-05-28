@@ -47,11 +47,11 @@ end
 module IODumper
   module_function
 
-  def dump(io, logger, kernel)
+  def dump(io, logger, prefix, kernel)
     while !io.closed? && !io.eof?
       kernel.sleep 0.1
       s = io.readpartial(1024).inspect.gsub('\t', "\t").gsub '\n', "\n"
-      logger.debug s
+      logger.debug "#{prefix}#{s}"
     end
   ensure
     io.close
@@ -153,7 +153,7 @@ class RxThread
   end
 
   def dump_rest
-    IODumper.dump @sock, @logger, @kernel
+    IODumper.dump @sock, @logger, "", @kernel
   end
 end
 
@@ -163,14 +163,24 @@ def create_logger(err_out)
   l
 end
 
+def start_vm_thread(logger, kernel)
+  Thread.new do
+    IO.popen "make run2 2>&1", "r+" do |io|
+      Thread.current[:io] = io
+      IODumper.dump io, logger, "vm ", kernel
+    end
+  end
+end
+
 def do_work(vm_driver, port, err_out, kernel)
   l = create_logger err_out
   l.info "start"
   vm_driver.srv = srv = TCPServer.new "127.0.0.1", port
+  vm_th = start_vm_thread l, kernel
   s = srv.accept
   l.info ACCEPTED
   th = RxThread.start s, l, kernel
-  vm_driver.todo = { :l => l, :s => s, :th => th }
+  vm_driver.todo = { :l => l, :s => s, :th => th, :vm_th => vm_th }
 
   IRB.start __FILE__
 
