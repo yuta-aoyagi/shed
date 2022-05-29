@@ -72,8 +72,9 @@ class RxThread
 
   def call
     expect_fully_booted(40) && ifup && expand_rootfs &&
-      expect_fully_booted(390) && install_docker && setup_ssh
+      expect_fully_booted(390) && install_docker && setup_ssh && ok_to_finish
     dump_rest
+    final_cleanup_if_ok
   ensure
     @logger.info "rx finished"
   end
@@ -161,6 +162,18 @@ class RxThread
 
   def dump_rest
     IODumper.dump @sock, @logger, "", @kernel
+  end
+
+  def ok_to_finish
+    @ok = !(@sock << "sync && sync && sync && poweroff\n").nil?
+  end
+
+  def final_cleanup_if_ok
+    return unless @ok
+
+    @kernel.sleep 1 # ideally, Thread#join on the VM thread
+    t = Thread.current
+    (a = t.group.list - [t]).size == 1 && a.first.exit
   end
 end
 
