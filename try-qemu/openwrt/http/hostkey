@@ -15,7 +15,7 @@
 START=95
 
 extract_sub() {
-	dropbearkey -y -f "/etc/dropbear/dropbear_${1}_host_key"
+	dropbearkey -y -f "/etc/dropbear/dropbear_$1"_host_key
 }
 
 extract() {
