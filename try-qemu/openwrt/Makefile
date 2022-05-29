@@ -55,4 +55,4 @@ srv:
 
 run2:
 	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
-	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -nographic -serial tcp:127.0.0.1:4444 -L "$$l_arg" "$(DISK)"
+	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -m 192 -nographic -serial tcp:127.0.0.1:4444 -L "$$l_arg" "$(DISK)"
