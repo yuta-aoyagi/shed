@@ -72,7 +72,7 @@ class RxThread
 
   def call
     expect_fully_booted(40) && ifup && expand_rootfs &&
-      expect_fully_booted(390) && install_docker
+      expect_fully_booted(390) && install_docker && setup_ssh
     dump_rest
   ensure
     @logger.info "rx finished"
@@ -136,6 +136,13 @@ class RxThread
       send_and_wait("opkg install containerd\n", 980) &&
       send_and_wait("opkg install dockerd\n", 870) &&
       send_and_wait("opkg install docker\n", 310)
+  end
+
+  def setup_ssh
+    s = "rm /etc/dropbear/dropbear_*_host_key &&\n" \
+        "  wget -P /etc/init.d http://10.0.2.2:40080/hostkey &&\n" \
+        "  chmod +x /etc/init.d/hostkey && $_ enable\n"
+    send_and_wait s, 4
   end
 
   def send_and_wait(buf, timeout)

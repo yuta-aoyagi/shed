@@ -1,0 +1,38 @@
+#!/bin/sh /etc/rc.common
+
+# SPDX-FileCopyrightText: Copyright 2022 Yuta Aoyagi <https://github.com/yuta-aoyagi>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+# @(#)hostkey: extracts an SSH host public key to the kernel message ring
+
+# Some other projects (autoconf & shunit2) say `` is more portable than $().
+# shellcheck disable=2006
+
+:
+
+# shellcheck disable=2034 # used in rc.common
+START=95
+
+extract_sub() {
+	dropbearkey -y -f "/etc/dropbear/dropbear_${1}_host_key"
+}
+
+extract() {
+	n=`{ { extract_sub "$1"; echo $? >&6; } | grep '^ssh-' >&5; } 6>&1` &&
+		[ 0 = "$n" ]
+}
+
+msg() {
+	printf %s\\n "$1" >/dev/kmsg
+}
+
+boot() {
+	if k=`extract ed25519 5>&1` && [ -n "$k" ]; then
+		msg "<14>-----BEGIN SSH HOST KEY-----"
+		msg "<14>$k"
+		msg "<14>-----END SSH HOST KEY-----"
+	else
+		msg "<12>can't find SSH host Ed25519 key"
+	fi
+}
