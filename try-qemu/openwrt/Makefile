@@ -16,29 +16,10 @@ $(DISK): $(ORIG_DISK_QCOW2)
 	$(QEMU_IMG) create -f qcow2 -b "$<" -F qcow2 "$@"
 	$(QEMU_IMG) resize "$@" 420M
 
-$(ORIG_DISK_QCOW2): $(ORIG_DISK)
-	$(QEMU_IMG) convert -c -O qcow2 "$<" "$@"
-	$(QEMU_IMG) compare -s "$<" "$@" || $(QEMU_IMG) compare "$<" "$@"
-
 $(ORIG_DISK): $(ORIG_DISK_GZ)
 	printf "a1d1416bb456815ec7c4543df08f0eb81d365796042c562e40a46ab07b0d514c *%s\\n" "$<" | \
 	    sha256sum -c --strict
-	try_zcat() { \
-	  set +e && { zcat "$<" >"$@"; } 2>&1; ret=$$?; echo X && return $$ret; \
-	} && \
-	expected() { \
-	  LF=`echo && echo _` && LF=$${LF%_} && \
-	  exp="$${LF}gzip: $<: decompression OK, trailing garbage ignored$$LF" && \
-	  [ "$$exp" = "$${msgX%X}" ]; \
-	} && \
-	if msgX=`try_zcat`; then \
-	  printf %s "$${msgX%X}" >&2; \
-	elif ret=$$? && [ $$ret = 2 ] && expected; then \
-	  echo a known warning is ignored. >&2; \
-	else \
-	  printf %s "$${msgX%X}" >&2 && \
-	      set_status() { return "$$1"; } && set_status $$ret; \
-	fi
+	$(MAKE) "DECOMPRESS_IN=$(ORIG_DISK_GZ)" "DECOMPRESS_OUT=$(ORIG_DISK)" decompress
 
 info: $(DISK)
 	$(QEMU_IMG) info --backing-chain "$(DISK)"
@@ -56,3 +37,26 @@ srv:
 run2:
 	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
 	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -m 192 -nographic -serial tcp:127.0.0.1:4444 -L "$$l_arg" "$(DISK)"
+
+decompress: $(DECOMPRESS_IN)
+	try_zcat() { \
+	  set +e && { zcat "$(DECOMPRESS_IN)" >"$(DECOMPRESS_OUT)"; } 2>&1; \
+	  ret=$$?; echo X && return $$ret; \
+	} && \
+	expected() { \
+	  LF=`echo && echo _` && LF=$${LF%_} && \
+	  exp="$${LF}gzip: $(DECOMPRESS_IN): decompression OK, trailing garbage ignored$$LF" && \
+	  [ "$$exp" = "$${msgX%X}" ]; \
+	} && \
+	msgX=`try_zcat`; ret=$$? && \
+	if [ $$ret = 2 ] && expected; then \
+	  echo a known warning is ignored. >&2; \
+	else \
+	  printf %s "$${msgX%X}" >&2 && \
+	      set_status() { return "$$1"; } && set_status $$ret; \
+	fi
+
+.SUFFIXES: .img .qcow2
+.img.qcow2:
+	$(QEMU_IMG) convert -c -O qcow2 "$<" "$@"
+	$(QEMU_IMG) compare -s "$<" "$@" || $(QEMU_IMG) compare "$<" "$@"
