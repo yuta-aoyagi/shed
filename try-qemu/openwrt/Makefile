@@ -38,6 +38,23 @@ run2:
 	l_arg=`cygpath -m "$(QEMU)/pc-bios"` && \
 	    sh ../mingw.sh "$(QEMU)/build/qemu-system-x86_64" -m 192 -nographic -serial tcp:127.0.0.1:4444 -L "$$l_arg" "$(DISK)"
 
+VERSION = 21.02.3
+ORIG_DISK_QCOW2_2 = openwrt-$(VERSION)-orig.qcow2
+ORIG_DISK2 = openwrt-$(VERSION)-orig.img
+DL = /mnt/c/Users/$(USERNAME)/Downloads
+ORIG_DISK_GZ_FILENAME = openwrt-$(VERSION)-x86-64-generic-ext4-combined.img.gz
+ORIG_DISK_GZ2 = $(DL)/$(ORIG_DISK_GZ_FILENAME)
+
+disk2: $(ORIG_DISK_QCOW2_2)
+	$(MAKE) "ORIG_DISK_QCOW2=$(ORIG_DISK_QCOW2_2)" "$(DISK)"
+
+$(ORIG_DISK2): $(ORIG_DISK_GZ2)
+	cd "$(DL)" && \
+	    grep -F "$(ORIG_DISK_GZ_FILENAME)" "openwrt-$(VERSION)/sha256sums" \
+	    | sha256sum -cw --strict && \
+	    gunzip -lv "$(ORIG_DISK_GZ_FILENAME)"
+	$(MAKE) "DECOMPRESS_IN=$(ORIG_DISK_GZ2)" "DECOMPRESS_OUT=$(ORIG_DISK2)" decompress
+
 decompress: $(DECOMPRESS_IN)
 	try_zcat() { \
 	  set +e && { zcat "$(DECOMPRESS_IN)" >"$(DECOMPRESS_OUT)"; } 2>&1; \
