@@ -1,3 +1,5 @@
 /openwrt-orig.img
 /openwrt-orig.qcow2
+/openwrt-*-orig.img
+/openwrt-*-orig.qcow2
 /try.qcow2
