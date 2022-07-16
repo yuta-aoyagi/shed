@@ -6,6 +6,8 @@ step1:
 	  tr -d : | \
 	  grep 96BCEC06264976F37460779ACF28C5A7CFE8A3C0AAE11A8FFCEE05C0BDDF08C6
 
+# The example below saves the HTTP response to a file, and scans the message
+# from `openssl s_client`, to check the TLS verification succeeded or not.
 step2:
 	sh https.sh httpbin.org GET\ /headers 2>&1 >hb.txt | \
 	  grep "^verify return:[^0]"
