@@ -12,6 +12,9 @@ step2:
 	sh https.sh httpbin.org GET\ /headers 2>&1 >hb.txt | \
 	  grep "^verify return:[^0]"
 
+# Another examples below show the behavior difference, on a certain, quite old
+# environment. On such environment, step3 outputs `verify return:0` as the
+# verification failure.
 HOST = valid-isrgrootx1.letsencrypt.org
 REQ = GET\ /images/LE_badge_color.svg
 RES_FILE = LE_badge_color_response.dat
