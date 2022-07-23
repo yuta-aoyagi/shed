@@ -25,3 +25,10 @@ step3:
 
 step4:
 	sh https.sh "$(HOST)" $(REQ) -CAfile isrgrootx1.pem >$(RES_FILE)
+
+# The next example shows how striphdr.rb removes the response header from one
+# entire HTTP response message.
+step5: $(DL_FILE)
+
+$(DL_FILE): $(RES_FILE)
+	ruby -W striphdr.rb $(RES_FILE) >$(DL_FILE)
