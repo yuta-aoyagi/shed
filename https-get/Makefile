@@ -16,7 +16,8 @@ step2:
 # environment. On such environment, step3 outputs `verify return:0` as the
 # verification failure.
 HOST = valid-isrgrootx1.letsencrypt.org
-REQ = GET\ /images/LE_badge_color.svg
+DL_FILE = LE_badge_color.svg
+REQ = GET\ /images/$(DL_FILE)
 RES_FILE = LE_badge_color_response.dat
 
 step3:
