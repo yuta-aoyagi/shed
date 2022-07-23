@@ -11,3 +11,13 @@ step1:
 step2:
 	sh https.sh httpbin.org GET\ /headers 2>&1 >hb.txt | \
 	  grep "^verify return:[^0]"
+
+HOST = valid-isrgrootx1.letsencrypt.org
+REQ = GET\ /images/LE_badge_color.svg
+RES_FILE = LE_badge_color_response.dat
+
+step3:
+	sh https.sh "$(HOST)" $(REQ) >/dev/null
+
+step4:
+	sh https.sh "$(HOST)" $(REQ) -CAfile isrgrootx1.pem >$(RES_FILE)
