@@ -1,6 +1,7 @@
 #!/usr/bin/ruby -W
+# frozen_string_literal: true
 
-LFCRLF = [10, 13, 10]
+LFCRLF = [10, 13, 10].freeze
 
 def do_work(input, output)
   a = input.each_byte.to_a
