@@ -1,2 +1,2 @@
 #!/bin/sh
-docker build -t gnupg:2.2.35-alpine3.16.1 --build-arg ALPINE_VERSION=3.16.1 - <Dockerfile-gnupg
+docker build -t "gnupg:${VERSION_IN_TAG?}-alpine${ALPINE_VERSION?}" --build-arg ALPINE_VERSION - <Dockerfile-gnupg
