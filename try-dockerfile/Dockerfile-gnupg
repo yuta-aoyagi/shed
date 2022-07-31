@@ -1,0 +1,8 @@
+ARG ALPINE_VERSION
+FROM alpine:${ALPINE_VERSION}
+
+RUN apk add --no-cache gnupg && \
+	adduser -D app
+
+USER app
+WORKDIR /home/app
