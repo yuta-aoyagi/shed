@@ -5,9 +5,9 @@ FROM alpine:${ALPINE_VERSION} AS extract
 
 USER 1000:1000
 ARG VERSION
-RUN mkdir /tmp/gpgpdump_${VERSION} && \
-	cd /tmp/gpgpdump_${VERSION} && \
-	wget -O- https://github.com/goark/gpgpdump/releases/download/v${VERSION}/gpgpdump_${VERSION}_Linux_64bit.tar.gz | tar xzf -
+RUN mkdir "/tmp/gpgpdump_${VERSION}" && \
+	cd "/tmp/gpgpdump_${VERSION}" && \
+	wget -O- "https://github.com/goark/gpgpdump/releases/download/v${VERSION}/gpgpdump_${VERSION}_Linux_64bit.tar.gz" | tar xzf -
 
 FROM redhat/ubi8-micro:${UBI_VERSION}
 
