@@ -51,8 +51,7 @@ disk2: $(ORIG_DISK_QCOW2_2)
 $(ORIG_DISK2): $(ORIG_DISK_GZ2)
 	cd "$(DL)" && \
 	    grep -F "$(ORIG_DISK_GZ_FILENAME)" "openwrt-$(VERSION)/sha256sums" \
-	    | sha256sum -cw --strict && \
-	    gunzip -lv "$(ORIG_DISK_GZ_FILENAME)"
+	    | sha256sum -cw --strict
 	$(MAKE) "DECOMPRESS_IN=$(ORIG_DISK_GZ2)" "DECOMPRESS_OUT=$(ORIG_DISK2)" decompress
 
 decompress: $(DECOMPRESS_IN)
