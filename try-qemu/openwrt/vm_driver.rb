@@ -58,6 +58,15 @@ module IODumper
   end
 end
 
+# Installs dockerd.
+module DockerdInstaller
+  module_function
+
+  def call
+    yield("opkg install dockerd\n", 870)
+  end
+end
+
 # Handles the VM's serial output.
 class RxThread
   def self.start(sock, logger, kernel)
@@ -135,7 +144,7 @@ class RxThread
     @sock << "opkg install runc\n"
     my_expect(/^Configuring runc/, 150) && expect_prompt(2) &&
       send_and_wait("opkg install containerd\n", 980) &&
-      send_and_wait("opkg install dockerd\n", 870) &&
+      DockerdInstaller.call(&method(:send_and_wait)) &&
       send_and_wait("opkg install docker\n", 310)
   end
 
