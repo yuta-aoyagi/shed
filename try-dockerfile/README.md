@@ -5,6 +5,13 @@ How to build:
 	VERSION_IN_TAG=2.2.35 ALPINE_VERSION=3.16.1 sh docker-gnupg.sh
 	VERSION=0.14.0 UBI_VERSION=8.6-394 ALPINE_VERSION=3.16.1 sh docker-gpgpdump.sh
 
+Note in 2023Q1:
+
+	VERSION_IN_TAG=2.2.40 ALPINE_VERSION=3.17.1 sh docker-gnupg.sh
+	VERSION=0.15.0 UBI_VERSION=9.1.0-13 ALPINE_VERSION=3.17.1 sh docker-gpgpdump.sh
+
+If you run redhat/ubi9-micro images on x64 architecture, you need CPUs compatible with x86-64-v2 variant or later.
+
 Example run:
 
 	docker volume create testgpg
