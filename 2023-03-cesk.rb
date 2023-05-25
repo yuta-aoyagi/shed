@@ -31,51 +31,51 @@ def valid_clo?(clo)
   (fv(m) - dom).empty?
 end
 
-def cesk(c, e, s, k)
-  if c == :daggar
-    raise "expected empty E, but was #{e}" if e
-    raise "expected ret-k, but was #{k}" if k[1] != :ret
+def cesk(control, env, store, kont)
+  if control == :daggar
+    raise "expected empty E, but was #{env}" if env
+    raise "expected ret-k, but was #{kont}" if kont[1] != :ret
 
-    if k.first == :stop
-      clo = k[2]
+    if kont.first == :stop
+      clo = kont[2]
       raise "BUG invalid value #{clo}" unless valid_clo?(clo)
 
       nil
-    elsif k.first[1] == :arg
-      [k.first[2], k.first[3], s, [k.first.first, :fun, k.last]]
-    elsif k.first[1] == :fun
-      clo = k.first[2]
-      v = k.last
+    elsif kont.first[1] == :arg
+      [kont.first[2], kont.first[3], store, [kont.first.first, :fun, kont.last]]
+    elsif kont.first[1] == :fun
+      clo = kont.first[2]
+      v = kont.last
       abs, rho = clo
       _, x, m = abs
       case abs.first
       when :lambda
         n = $num ||= 0 # FIXME
         $num += 1
-        [m, [rho, x, n], [s, n, v], k.first.first]
+        [m, [rho, x, n], [store, n, v], kont.first.first]
       else
         niy
       end
     else
       niy
     end
-  elsif c.is_a? Symbol
-    x = c
-    it = e
+  elsif control.is_a? Symbol
+    x = control
+    it = env
     it = it.first while it && it[1] != x
-    raise "undefined variable #{x} in #{e}" unless it
+    raise "undefined variable #{x} in #{env}" unless it
 
     n = it.last
-    it = s
+    it = store
     it = it.first while it && it[1] != n
-    raise "BUG unbound store #{n} in #{s}" unless it
+    raise "BUG unbound store #{n} in #{store}" unless it
 
     clo = it.last
-    [:daggar, nil, s, [k, :ret, clo]]
-  elsif c.first == :lambda
-    [:daggar, nil, s, [k, :ret, [c, e]]]
-  elsif c.size == 2 # application
-    [c.first, e, s, [k, :arg, c.last, e]]
+    [:daggar, nil, store, [kont, :ret, clo]]
+  elsif control.first == :lambda
+    [:daggar, nil, store, [kont, :ret, [control, env]]]
+  elsif control.size == 2 # application
+    [control.first, env, store, [kont, :arg, control.last, env]]
   else
     niy
   end
