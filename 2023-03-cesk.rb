@@ -31,6 +31,14 @@ def valid_clo?(clo)
   (fv(m) - dom).empty?
 end
 
+# apply a partial function func to arg
+# or nil if arg isn't in func's domain
+def apply(func, arg)
+  it = func
+  it = it.first while it && it[1] != arg
+  it ? it.last : nil
+end
+
 def cesk(control, env, store, kont)
   if control == :daggar
     raise "expected empty E, but was #{env}" if env
@@ -61,16 +69,9 @@ def cesk(control, env, store, kont)
     end
   elsif control.is_a? Symbol
     x = control
-    it = env
-    it = it.first while it && it[1] != x
-    raise "undefined variable #{x} in #{env}" unless it
+    raise "undefined variable #{x} in #{env}" unless (n = apply env, x)
+    raise "BUG unbound store #{n} in #{store}" unless (clo = apply store, n)
 
-    n = it.last
-    it = store
-    it = it.first while it && it[1] != n
-    raise "BUG unbound store #{n} in #{store}" unless it
-
-    clo = it.last
     [:daggar, nil, store, [kont, :ret, clo]]
   elsif control.first == :lambda
     [:daggar, nil, store, [kont, :ret, [control, env]]]
