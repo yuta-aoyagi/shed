@@ -7,15 +7,15 @@ def niy
   raise "Not implemented yet"
 end
 
-def fv(m)
-  if m.is_a? Symbol
-    [m]
-  elsif m.first == :lambda
-    fv(m[2]) - [m[1]]
-  elsif m.size == 2
-    fv(m.first).union fv(m.last)
+def fv(term)
+  if term.is_a? Symbol
+    [term]
+  elsif term.first == :lambda
+    fv(term[2]) - [term[1]]
+  elsif term.size == 2
+    fv(term.first).union fv(term.last)
   else
-    raise "Bad term #{m}"
+    raise "Bad term #{term}"
   end
 end
 
