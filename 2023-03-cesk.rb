@@ -81,8 +81,8 @@ def cesk(c, e, s, k)
   end
 end
 
-def eval_cesk(m)
-  c = m
+def eval_cesk(term)
+  c = term
   e = s = nil
   k = :stop
   Enumerator.new do |y|
@@ -95,9 +95,9 @@ def eval_cesk(m)
 end
 
 # max >= 1
-def try_limited(m, max)
+def try_limited(term, max)
   n = max - 1
-  ret = eval_cesk(m).with_index do |(c, e, s, k), i|
+  ret = eval_cesk(term).with_index do |(c, e, s, k), i|
     pp [i, c, e, s, k]
     break :exceeded if i >= n
   end
