@@ -39,6 +39,7 @@ def cesk(c, e, s, k)
     if k.first == :stop
       clo = k[2]
       raise "BUG invalid value #{clo}" unless valid_clo?(clo)
+
       nil
     elsif k.first[1] == :arg
       [k.first[2], k.first[3], s, [k.first.first, :fun, k.last]]
