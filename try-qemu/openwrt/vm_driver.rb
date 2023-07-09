@@ -9,7 +9,7 @@ require "socket"
 require "time"
 
 class VMDriver
-  class <<self
+  class << self
     attr_accessor :srv, :todo
   end
 end
@@ -39,7 +39,7 @@ class LogFormatter
     diff = @base ? (time - @base).to_s : "N/A"
     msg_str = msg.is_a?(String) ? msg : msg.inspect
     svr = format "%5s", severity
-    "[#{time_str} (#{diff}) \##{$PID}] #{svr}: #{msg_str}\n"
+    "[#{time_str} (#{diff}) ##{$PID}] #{svr}: #{msg_str}\n"
   end
 end
 
@@ -60,7 +60,7 @@ end
 
 # Installs dockerd.
 module DockerdInstaller
-  ADJUST_FIREWALL = <<-'SHELL'.gsub(/^    /, "").freeze
+  ADJUST_FIREWALL = <<-SHELL.gsub(/^    /, "").freeze
     date && opkg info firewall4 | grep -q installed && date &&
       opkg remove luci-ssl luci luci-app-firewall firewall4 && date &&
       opkg install firewall
