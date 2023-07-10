@@ -61,7 +61,7 @@ end
 # Installs dockerd.
 module DockerdInstaller
   ADJUST_FIREWALL = <<-SHELL.gsub(/^    /, "").freeze
-    date && opkg info firewall4 | grep -q installed && date &&
+    date && opkg info firewall4 | grep -q " installed" && date &&
       opkg remove luci-ssl luci luci-app-firewall firewall4 && date &&
       opkg install firewall
   SHELL
