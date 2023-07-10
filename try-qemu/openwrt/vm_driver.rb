@@ -8,6 +8,7 @@ require "logger"
 require "socket"
 require "time"
 
+# Holds some instance variables instead of global variables.
 class VMDriver
   class << self
     attr_accessor :srv, :todo
