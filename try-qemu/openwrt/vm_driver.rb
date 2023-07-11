@@ -125,7 +125,8 @@ class RxThread
 
   def ifup
     empty = ""
-    send_and_wait(IO.readlines("ifup.sh").grep(/^[^\n#]/).join(empty), 30) &&
+    sh = File.open("ifup.sh") { |f| f.grep(/^[^\n#]/).join(empty) }
+    send_and_wait(sh, 30) &&
       expect_link_ready(120)
   end
 
