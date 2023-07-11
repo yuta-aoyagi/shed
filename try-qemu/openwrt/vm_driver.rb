@@ -75,6 +75,12 @@ module DockerdInstaller
   end
 end
 
+SSH_SETUP_COMMAND = <<SHELL.gsub(/^  /, "").freeze
+  rm /etc/dropbear/dropbear_*_host_key &&
+    wget -P /etc/init.d http://10.0.2.2:40080/hostkey &&
+    chmod +x /etc/init.d/hostkey && $_ enable
+SHELL
+
 # Handles the VM's serial output.
 class RxThread
   def self.start(sock, logger, kernel)
@@ -157,10 +163,7 @@ class RxThread
   end
 
   def setup_ssh
-    s = "rm /etc/dropbear/dropbear_*_host_key &&\n" \
-        "  wget -P /etc/init.d http://10.0.2.2:40080/hostkey &&\n" \
-        "  chmod +x /etc/init.d/hostkey && $_ enable\n"
-    send_and_wait s, 4
+    send_and_wait SSH_SETUP_COMMAND, 4
   end
 
   def send_and_wait(buf, timeout)
