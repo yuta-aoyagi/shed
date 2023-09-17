@@ -9,12 +9,13 @@
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
+    expectations.syntax = :expect
   end
 
   config.mock_with :rspec do |mocks|
+    mocks.syntax = :expect
   end
 
-=begin
   # This setting enables warnings. It's recommended, but in some cases may
   # be too noisy due to issues in dependencies.
   config.warnings = true
@@ -29,5 +30,4 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = :random
-=end
 end
