@@ -5,6 +5,9 @@ AllCops:
 Layout/EndOfLine:
   EnforcedStyle: lf
 
+Style/FileRead:
+  Enabled: false
+
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
