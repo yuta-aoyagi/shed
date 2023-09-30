@@ -4,7 +4,6 @@ require "tempfile"
 
 RSpec.describe "try_openwrt's Makefile" do
   it "has a target `help`" do
-    pending
     Tempfile.open("", ".") do |out|
       out.close
       Tempfile.open("", ".") do |err|
