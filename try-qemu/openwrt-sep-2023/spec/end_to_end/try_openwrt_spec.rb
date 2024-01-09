@@ -14,8 +14,9 @@ RSpec.describe "try_openwrt's Makefile" do
 
   it "has a target to create a new disk image file" do
     Dir.mktmpdir nil, "." do |dir|
-      system "make DISK=#{dir}/test.qcow2 disk"
-      expect(File.writable?("#{dir}/test.qcow2")).to be(true)
+      img = "#{dir}/test.qcow2"
+      system "make DISK=#{img} disk"
+      expect(File.writable?(img)).to be(true)
     end
   end
 end
