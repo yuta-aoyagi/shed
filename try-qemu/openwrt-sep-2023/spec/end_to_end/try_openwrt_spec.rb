@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
-require "tmpdir"
+require "tempfile"
 
 RSpec.describe "try_openwrt's Makefile" do
   it "has a target `help`" do
     pending
-    Dir.mktmpdir nil, "." do |dir|
-      err = "#{dir}/err"
-      system "make help >#{dir}/out 2>#{err}"
-      stderr = File.open(err, &:read)
-      expect(stderr).to match(/usage.*make/)
+    Tempfile.open("", ".") do |err|
+      err.close
+      output = `make help 2>#{err.path}`
+      expect(output).to match(/usage.*make /)
     end
   end
 end
