@@ -16,11 +16,9 @@ RSpec.describe "try_openwrt's Makefile" do
     it "creates a disk image" do
       pending
       Dir.mktmpdir nil, "." do |dir|
-        Tempfile.open(["", ".qcow2"], ".") do |img|
-          img.close
-          system "make DISK=#{img.path} >#{dir}/out 2>#{dir}/err"
-          expect(img.size).to be > 1000
-        end
+        img = "#{dir}/disk.qcow2"
+        system %(make "DISK=#{img}" >"#{dir}/out" 2>"#{dir}/err")
+        expect(File.size(img)).to be > 1000
       end
     end
   end
