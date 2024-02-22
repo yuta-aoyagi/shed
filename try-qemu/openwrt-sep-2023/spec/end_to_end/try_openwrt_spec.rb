@@ -16,7 +16,8 @@ RSpec.describe "try_openwrt's Makefile" do
     it "creates a disk image" do
       pending
       Dir.mktmpdir nil, "." do |dir|
-        system %(cd "#{dir}" && make -f ../Makefile DISK=disk.qcow2 >out 2>err)
+        cmd = "ruby -W ../spec/end_to_end/rspec_to_make.rb"
+        system %(cd "#{dir}" && #{cmd} >out 2>err)
         expect(File.size("#{dir}/disk.qcow2")).to be > 1000
       end
     end
