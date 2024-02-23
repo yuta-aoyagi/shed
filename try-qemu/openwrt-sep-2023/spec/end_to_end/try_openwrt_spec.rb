@@ -14,7 +14,6 @@ RSpec.describe "try_openwrt's Makefile" do
 
   describe "default target" do
     it "creates a disk image" do
-      pending
       Dir.mktmpdir nil, "." do |dir|
         cmd = "ruby -W ../spec/end_to_end/rspec_to_make.rb"
         system %(cd "#{dir}" && #{cmd} >out 2>err)

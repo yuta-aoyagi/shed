@@ -5,7 +5,8 @@ QEMU_IMG = qemu-img
 all: disk
 
 help:
-	@echo "usage: make {ORIG_DISK=disk-orig.qcow2 {DISK=disk.qcow2 [all|disk]|check}|help}"
+	@echo "usage: ORIG_DISK=disk-orig.qcow2 make {DISK=disk.qcow2 [all|disk]|check}"
+	@echo "  or:  make help"
 
 disk: $(DISK)
 
