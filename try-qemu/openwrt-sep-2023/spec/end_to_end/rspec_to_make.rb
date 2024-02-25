@@ -1,13 +1,13 @@
 #!/usr/bin/ruby -W
 # frozen_string_literal: true
 
-ORIG_DISK = "ORIG_DISK"
+BASE_DISK = "BASE_DISK"
 
 def execute(env, kernel)
-  %r{\A[-.0-9A-Z_a-z][-./0-9A-Z_a-z]*\z} =~ (od = env.fetch(ORIG_DISK)) ||
-    raise("Currently tests can only be run with relative ORIG_DISK")
+  %r{\A[-.0-9A-Z_a-z][-./0-9A-Z_a-z]*\z} =~ (bd = env.fetch(BASE_DISK)) ||
+    raise("Currently tests can only be run with relative BASE_DISK")
 
-  env[ORIG_DISK] = "../#{od}"
+  env[BASE_DISK] = "../#{bd}"
   kernel.system "make -f ../Makefile DISK=disk.qcow2"
 end
 
