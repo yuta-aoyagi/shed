@@ -19,7 +19,7 @@
 
 使用例2
 
-    sh ../myqemu/myqemu.sh 'mintty sh -c "$QEMU -m 192 -cdrom /Users/$USERNAME/Downloads/alpine-virt-3.20.1-x86_64.iso -nographic $QEMUFLAGS"' &
+    mintty sh ../myqemu/myqemu.sh '$QEMU -m 192 -cdrom "/Users/$USERNAME/Downloads/alpine-virt-3.20.1-x86_64.iso" -nographic $QEMUFLAGS' &
 
 これはこのスクリプトを開発する以前であれば
 
