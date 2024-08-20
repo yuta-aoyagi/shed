@@ -1,0 +1,133 @@
+\usetheme[right]{Berkeley}
+
+\title{スライドの\mbox{サンプル}} % adjust line-breaking on sidebar
+
+\author{青柳\ 悠太}
+
+\institute{引数として \texttt{\string\institute} に渡す所属が\\ないんだよなあ}
+
+\date{2024年8月8～13日}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \tableofcontents
+\end{frame}
+
+\section{はじめに}
+
+\begin{frame}{はじめに}
+  \begin{alertblock}{注意}
+    本発表は個人として行うものであり、所属する会社の公式見解ではありません。
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{本発表について}
+
+  電子メールの引用は \texttt{verbatim} 環境にしたい:
+\begin{verbatim}
+2024年6月 dd 日 HH:MM (差出人) <nobody@example.jp>:
+> (引用したり)
+> (後略)
+\end{verbatim}
+  \pause
+
+  \bigskip
+  \begin{block}{概要}
+    実際に作ったスライドから本題を取り除いて、 Beamer のサンプルとして公開できるものにしてみる。
+  \end{block}
+\end{frame}
+
+\subsection{subsection}
+
+\begin{frame}[fragile]
+  \frametitle{subsection}
+  和文の文字同士の\ 間\ に\ スペースを入れたければ、バックスラッシュ \verb!\! をつける
+
+  \bigskip
+  箇条書き
+  \begin{itemize}
+  \item 上の\ スペース\ の件は、 {pdf\LaTeX} で \verb!\usepackage[whole]{bxcjkjatype}! を用いて \verb!CJK*! 環境に入る場合は必須
+    (つけないとスペースが入らない)
+  \item platex と dvipdfmx の組み合わせでは不要だが、つけても害はないはず
+    \begin{itemize}
+    \item (実は冒頭の \texttt{\string\author} で \verb*!\ ! をすでに使っている)
+    \item ついでに入れ子の箇条書きも試している
+    \end{itemize}
+  \item ここは入れ子の外
+  \end{itemize}
+\end{frame}
+
+\section{本題}
+
+\newcommand{\myframe}[2]{
+  \framebox{
+    \begin{minipage}{#1}#2\end{minipage}
+  }
+}
+
+\begin{frame}{本題: 概観}
+  \begin{center}
+    \myframe{0.75\textwidth}{
+      外の枠
+
+      \bigskip
+      \hspace{\stretch{1}}
+      \myframe{0.6\textwidth}{
+        中の枠
+
+        \bigskip
+        \myframe{0.7\textwidth}{さらに内側}
+
+        \bigskip
+        \myframe{0.7\textwidth}{
+          もう一つ内側
+
+          \bigskip
+          \framebox{最内\hspace{5em}}
+        }
+      }
+      \hspace{\stretch{1}}
+      \framebox{隣の枠}
+      \hspace{\stretch{1}}
+    }
+  \end{center}
+\end{frame}
+
+\subsection{本題の subsection}
+
+\begin{frame}{本題の subsection}
+  聴衆に問いかけて十秒くらい考えていただく？
+  \pause
+
+  \bigskip
+  \[
+  (\text{合計}) - (\text{引く数}) = (\text{差})
+  \]
+\end{frame}
+
+\subsection{subsection もう一つ}
+
+\begin{frame}{subsection もう一つ}
+  \begin{quote}
+    引用文
+  \end{quote}
+  (引用元を明記、 URL とかもね)
+\end{frame}
+
+\section{付録}
+
+\subsection{付録(1)}
+
+\begin{frame}{付録(1)}
+  書誌情報を2冊分。
+
+  もう1 frame では Web ページを2つ紹介した。
+\end{frame}
+
+\end{document}
