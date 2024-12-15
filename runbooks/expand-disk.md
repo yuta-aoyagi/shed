@@ -207,7 +207,7 @@ Alpine Linux にプリインストールされている fdisk は Busybox 版の
 イベントが処理される順序が入れ替わって一時的にデバイスファイルが削除されたままになっていたとしても、 `mdev -s` で復旧されないような不具合はこれまで経験していない。
 もしこれの害が十分に小さいならば、「 `mdev -s` を伴う `SEQ=NO` を採用して手間を減らす」のがもっとも合理的かもしれない。
 
-## ISOLINUX の操作(※3)
+### ISOLINUX の操作(※3)
 
 ステップ8で QEMU に `-nographic` オプションを渡しているので、 QEMU を呼び出した端末は QEMU monitor と仮想マシンのシリアルポートにつながっている。
 原因はおそらく端末のローカルエコーが有効なまま ISOLINUX がリモートエコーを返していることだが、入力する文字は二重に表示されるかもしれない。
@@ -215,20 +215,20 @@ Alpine Linux にプリインストールされている fdisk は Busybox 版の
 
 元のステップで書いた `Ctrl-U` は [入力中の文字列を削除する](https://wiki.syslinux.org/wiki/index.php?title=Cli) の意味である。
 
-## mdev.seq および mdev.log (※4)
+### mdev.seq および mdev.log (※4)
 
 `mdev.seq` を有効にする方法は [ドキュメントに記載がある](https://git.busybox.net/busybox/tree/docs/mdev.txt?h=1_36_1#n147) 。
 ログのパスが `/dev/mdev.log` で固定であり、ファイルが存在するときだけ書き込まれることは [usage に書かれている](https://git.busybox.net/busybox/tree/util-linux/mdev.c?h=1_36_1#n112) 。
 
-## `exec /sbin/init` (※5)
+### `exec /sbin/init` (※5)
 
 「カーネルコマンドラインに `init=/bin/sh` を加えて作業してから `exec /sbin/init` で通常の起動を続けさせる」というのは古の知恵なのだが、筆者がどこでこのテクニックを理解に落とし込んだかを思い出してみると、たぶん [X のこのポスト](https://x.com/yamaken/status/1202115438240358401) じゃないだろうか。
 
-## `/dev/disk/by-label` (※6)
+### `/dev/disk/by-label` (※6)
 
 Alpine Linux においては mdev-conf パッケージが提供する設定・スクリプトによって、パーティションに対応するシンボリックリンクがディレクトリ `/dev/disk/by-label` で自動的に作成・削除される。
 
-## 後半の `printf` コマンド(※7)
+### 後半の `printf` コマンド(※7)
 
 この `printf` コマンドは fdisk が終了した時刻をカーネルのメッセージリングへ書き込む意図である。
 そのため fdisk とは続けて実行されるようセミコロンでつなぐ1行にしてある。
@@ -236,12 +236,12 @@ Alpine Linux においては mdev-conf パッケージが提供する設定・�
 このランブックを開発している環境においては、 `$DISK` パーティションテーブルの更新がカーネルに認識されてからこの `printf` コマンドまで0.12～0.18秒ほどかかるようだ。
 `LOG=NO` でない場合は mdev.log からイベントを探すのにこの時刻を利用できる。
 
-## fdisk の操作(※8)
+### fdisk の操作(※8)
 
 このランブックの元になった [OpenWrt の Wiki](https://openwrt.org/docs/guide-user/installation/openwrt_x86#expanding_root_partition_with_fdisk) の記述とは少し異なる。
 これは OpenWrt の fdisk が util-linux 版である一方、このランブックで採用した Alpine Linux にプリインストールされている fdisk は Busybox 版であるため。
 最大の差は、パーティションを作り直したときにファイルシステムのシグネチャを消去するか尋ねてこないこと。
 
-## デバイスファイルの再作成(※9)
+### デバイスファイルの再作成(※9)
 
 調べる過程で `partprobe "$DISK"` や `blockdev --rereadpt "$DISK"` も見つけたが、試した限りではうまく動かないこともあり、 `mdev -s` より確実さに劣る。
