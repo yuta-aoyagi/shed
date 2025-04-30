@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <!--
+    SPDX-FileCopyrightText: 2025 yuta-aoyagi "https://github.com/yuta-aoyagi"
+    SPDX-License-Identifier: GPL-3.0-only
+  -->
+  <title>Your device's clock</title>
+  <link rev="made" href="https://github.com/yuta-aoyagi/shed/tree/try-1">
+  <link rel="start" href="https://github.com/yuta-aoyagi/shed/tree/try-1">
+
+  <script type="text/javascript">
+    <!--
+    window.onload = (function(count, interval, w) {
+        "use strict";
+
+        function pad0(num, digits) { // `digits` should be 2 or 3.
+            var s = "00" + num;
+            return s.slice(s.length - digits);
+        }
+
+        function timeStringFrom(d) {
+            var s = pad0(d.getHours(), 2) + ":" + pad0(d.getMinutes(), 2) +
+                ":" + pad0(d.getSeconds(), 2) + "." +
+                pad0(d.getTime() % 1000, 3);
+            return s;
+        }
+
+        // The main part of this program, called by `setTimeout`.
+        function onTick(n, clock, output, schedule) {
+            // Another HTML-lint told me to avoid less-than symbol.
+            if (0 >= n) return;
+
+            var str = timeStringFrom(clock()) + " / " + n;
+            output(str + "\n");
+
+            schedule(n - 1);
+        }
+
+        // Inject the dependencies and then schedule `onTick`.
+        return function(_e) {
+            var textarea = w.document.forms[0].elements[0];
+            var clock = function() { return new Date(); };
+            var output = function(s) {
+                textarea.value = s + textarea.value;
+            };
+            var schedule = function(n) {
+                var f = function() { onTick(n, clock, output, schedule); };
+                // Some versions of Internet Explorer can't pass extra
+                // arguments, so they're wrapped into a closure `f`.
+                w.setTimeout(f, interval);
+            }
+            schedule(count);
+        };
+    })(100, 314, window);
+    // -->
+  </script>
+</head>
+<body>
+  <h1>Your device's clock</h1>
+  <noscript>
+    <p>This HTML document needs JavaScript to work properly.</p>
+  </noscript>
+  <form action="#">
+    <p>
+      <textarea rows=15 cols=60 tabindex=0 accesskey="Z"
+        >The output will be come above here.</textarea>
+    </p>
+  </form>
+</body>
+</html>
